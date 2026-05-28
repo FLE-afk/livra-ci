@@ -636,7 +636,7 @@ function Auth({type,onAuth,onBack}){
   const isA=type==="admin";
   const hBg=isA?C.adminBg:isV?C.vendeurBg:C.livreurBg;
 
-  const submit=()=>{
+  const submit=async()=>{
     if(isA){
       if(form.phone==="admin"&&form.password==="admin123"){
         onAuth({id:"admin",name:"Administrateur",phone:"admin"},"admin");
