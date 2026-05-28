@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from './supabase.js'
 
 const C = {
   bg:"#F7F5F0",ink:"#0D0D0D",white:"#FFFFFF",
