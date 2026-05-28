@@ -265,6 +265,19 @@ function PagePaiement({user, userType, onBack, onSubmit}){
       statut: "en_attente",
     };
     DEMANDES_PAIEMENT.push(dem);
+    await supabase.from('demandes_paiement').insert({
+      id: dem.id,
+      user_id: dem.userId,
+      user_type: dem.userType,
+      user_name: dem.userName,
+      user_phone: dem.userPhone,
+      plan: dem.plan,
+      periode: dem.periode,
+      montant: dem.montant,
+      methode: dem.methode,
+      reference: dem.reference,
+      statut: 'en_attente'
+    });
     setTimeout(()=>{ onSubmit(dem); }, 800);
   };
 
@@ -1004,8 +1017,6 @@ function NewOrderModal({vendeur,onAdd,onClose}){
   const submit=async()=>{
     if(!ok)return;
     const id=genId();
-    const commande={id,vendeur:vendeur.name,vendeur_id:vendeur.id,client:f.client,client_phone:f.clientPhone,product:f.product||"Colis",pickup_address:f.pickupAddress||"Adresse vendeur",delivery_address:f.deliveryAddress,amount:parseInt(f.amount)||0,status:"disponible",livreur_id:null,livreur_name:null,livreur_phone:null,created_at:now(),steps:JSON.stringify([{label:"Commande créée",time:now(),done:true},{label:"Livreur assigné",time:null,done:false},{label:"Récupéré chez vendeur",time:null,done:false},{label:"En route",time:null,done:false},{label:"Livré",time:null,done:false}])};
-    await supabase.from('commandes').insert(commande);
     onAdd({id,vendeur:vendeur.name,vendeurId:vendeur.id,client:f.client,clientPhone:f.clientPhone,product:f.product||"Colis",pickupAddress:f.pickupAddress||"Adresse du vendeur",deliveryAddress:f.deliveryAddress,amount:parseInt(f.amount)||0,status:"disponible",livreurId:null,livreurName:null,livreurPhone:null,createdAt:now(),steps:[{label:"Commande créée",time:now(),done:true},{label:"Livreur assigné",time:null,done:false},{label:"Récupéré chez vendeur",time:null,done:false},{label:"En route",time:null,done:false},{label:"Livré",time:null,done:false}]});
   };
   return(
