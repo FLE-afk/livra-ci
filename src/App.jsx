@@ -644,12 +644,20 @@ function Auth({type,onAuth,onBack}){
     }
     if(!form.phone||!form.password)return;
     if(mode==="register"){
-      if(isV){const v={id:"v"+Date.now(),name:form.name||"Ma Boutique",phone:form.phone,shop:form.shop||"Boutique en ligne",joined:"Mai 2026",abonnement:null};VENDEURS.push(v);onAuth(v,"vendeur");}
-      else{const l={id:"l"+Date.now(),name:form.name||"Livreur",phone:form.phone,rating:5.0,livraisons:0,joined:"Mai 2026",abonnement:null};LIVREURS.push(l);onAuth(l,"livreur");}
+      if(isV){
+        const v={id:"v"+Date.now(),name:form.name||"Ma Boutique",phone:form.phone,shop:form.shop||"Boutique en ligne",joined:"Mai 2026",abonnement:null};
+        await supabase.from('vendeurs').insert(v);
+        onAuth(v,"vendeur");
+      }else{
+        const l={id:"l"+Date.now(),name:form.name||"Livreur",phone:form.phone,rating:5.0,livraisons:0,joined:"Mai 2026",abonnement:null};
+        await supabase.from('livreurs').insert(l);
+        onAuth(l,"livreur");
+      }
     }else{
-      const db=isV?VENDEURS:LIVREURS;
-      const u=db.find(x=>x.phone===form.phone)||db[0];
-      onAuth(u,type);
+      const table=isV?'vendeurs':'livreurs';
+      const {data}=await supabase.from(table).select('*').eq('phone',form.phone).single();
+      if(data) onAuth(data,type);
+      else alert("Numéro introuvable. Vérifiez ou inscrivez-vous.");
     }
   };
 
@@ -993,7 +1001,7 @@ function NewOrderModal({vendeur,onAdd,onClose}){
   const [f,setF]=useState({client:"",clientPhone:"",product:"",pickupAddress:"",deliveryAddress:"",amount:""});
   const s=(k,v)=>setF(p=>({...p,[k]:v}));
   const ok=f.client&&f.clientPhone&&f.deliveryAddress&&f.amount;
-  const submit=()=>{
+  const submit=async()=>{
     if(!ok)return;
     const id=genId();
     onAdd({id,vendeur:vendeur.name,vendeurId:vendeur.id,client:f.client,clientPhone:f.clientPhone,product:f.product||"Colis",pickupAddress:f.pickupAddress||"Adresse du vendeur",deliveryAddress:f.deliveryAddress,amount:parseInt(f.amount)||0,status:"disponible",livreurId:null,livreurName:null,livreurPhone:null,createdAt:now(),steps:[{label:"Commande créée",time:now(),done:true},{label:"Livreur assigné",time:null,done:false},{label:"Récupéré chez vendeur",time:null,done:false},{label:"En route",time:null,done:false},{label:"Livré",time:null,done:false}]});
