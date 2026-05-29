@@ -247,7 +247,7 @@ function PagePaiement({user, userType, onBack, onSubmit}){
 
   const plans = periode === "mois" ? PLANS : PLANS_ANNUELS;
 
-  const submit = () => {
+  const submit = async () => {
     if(!reference.trim()){ return; }
     setEnvoi(true);
     const dem = {
